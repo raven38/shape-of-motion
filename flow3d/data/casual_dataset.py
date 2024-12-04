@@ -143,6 +143,7 @@ class CasualDataset(BaseDataset):
             [frame_name + ".png" for frame_name in self.frame_names],                           
             )
             Ks = torch.from_numpy(Ks[:, :3, :3].astype(np.float32))
+            Ks[:, :2] /= 2
             w2cs = torch.from_numpy(w2cs.astype(np.float32))            
             tstamps = torch.arange(len(frame_names))
         else:
