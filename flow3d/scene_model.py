@@ -25,7 +25,7 @@ class SceneModel(nn.Module):
         scene_scale = 1.0 if bg_params is None else bg_params.scene_scale
         self.register_buffer("bg_scene_scale", torch.as_tensor(scene_scale))
         self.register_buffer("Ks", Ks)
-        self.register_parameter("w2cs", w2cs)
+        self.w2cs = nn.Parameter(w2cs)
 
         self._current_xys = None
         self._current_radii = None
