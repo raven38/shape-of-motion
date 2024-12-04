@@ -25,12 +25,16 @@ class MotionLRConfig:
     rots: float = 1.6e-4
     transls: float = 1.6e-4
 
+@dataclass
+class CameraLRConfig:
+    w2cs: float = 1.6e-4
 
 @dataclass
 class SceneLRConfig:
     fg: FGLRConfig
     bg: BGLRConfig
     motion_bases: MotionLRConfig
+    camera: CameraLRConfig
 
 
 @dataclass

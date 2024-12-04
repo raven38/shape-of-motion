@@ -115,6 +115,29 @@ class GaussianParams(nn.Module):
         updated_params = {"opacities": self.params["opacities"]}
         return updated_params
 
+class CameraParams(nn.Module):
+    def __init__(
+        self,
+        w2cs: torch.Tensor,
+    ):
+        super().__init__()
+        params_dict = {
+            "w2cs": nn.Parameter(w2cs),
+        }
+        self.params = nn.ParameterDict(params_dict)
+
+    @staticmethod
+    def init_from_state_dict(state_dict, prefix="params."):
+        req_keys = ["w2cs"]
+        assert all(f"{prefix}{k}" in state_dict for k in req_keys)
+        args = {k: state_dict[f"{prefix}{k}"] for k in req_keys}
+
+        return CameraParams(**args)
+
+    def get_w2cs(self) -> torch.Tensor:
+        return self.params["colors"]
+
+
 
 class MotionBases(nn.Module):
     def __init__(self, rots, transls):
