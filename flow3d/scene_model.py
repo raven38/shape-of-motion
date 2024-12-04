@@ -211,7 +211,7 @@ class SceneModel(nn.Module):
         if isinstance(bg_color, float):
             bg_color = torch.full((C, D), bg_color, device=device)
         assert isinstance(bg_color, torch.Tensor)
-
+        print(bg_color.shape)
         mode = "RGB"
         ds_expected = {"img": D}
 
@@ -222,6 +222,7 @@ class SceneModel(nn.Module):
             else:
                 mask_values = torch.ones((self.num_fg_gaussians, 1), device=device)
             colors_override = torch.cat([colors_override, mask_values], dim=-1)
+            print(bg_color.shape)
             bg_color = torch.cat([bg_color, torch.zeros(C, 1, device=device)], dim=-1)
             ds_expected["mask"] = 1
 
