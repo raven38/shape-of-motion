@@ -25,7 +25,7 @@ class SceneModel(nn.Module):
         scene_scale = 1.0 if bg_params is None else bg_params.scene_scale
         self.register_buffer("bg_scene_scale", torch.as_tensor(scene_scale))
         self.register_buffer("Ks", Ks)
-        self.register_buffer("w2cs", w2cs)
+        self.register_parameter("w2cs", w2cs)
 
         self._current_xys = None
         self._current_radii = None
@@ -176,6 +176,8 @@ class SceneModel(nn.Module):
         fg_only: bool = False,
         filter_mask: torch.Tensor | None = None,
     ) -> dict:
+        w2cs = self.w2cs[t]
+        target_w2cs = self.w2cs[target_ts]
         device = w2cs.device
         C = w2cs.shape[0]
 
