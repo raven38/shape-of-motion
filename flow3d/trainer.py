@@ -261,11 +261,13 @@ class Trainer:
             bg_color = torch.ones(1, 3, device=device)
             rendered = self.model.render(
                 ts[i].item(),
-                w2cs[None, i],
+                # w2cs[None, i],
+                self.model.camera.params.w2cs[ts[i].item()].unsqueeze(0),
                 Ks[None, i],
                 img_wh,
                 target_ts=target_ts[i],
-                target_w2cs=target_w2cs[i],
+                # target_w2cs=target_w2cs[i],
+                target_w2cs=self.model.camera.params.w2cs[target_ts[i]],
                 bg_color=bg_color,
                 means=means[i],
                 quats=quats[i],
