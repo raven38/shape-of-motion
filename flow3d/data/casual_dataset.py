@@ -23,6 +23,7 @@ from flow3d.data.utils import (
     normalize_coords,
     parse_tapir_track_info,
 )
+from flow3d.data.colmap import get_colmap_camera_params
 from flow3d.transforms import rt_to_mat4
 
 
@@ -136,6 +137,12 @@ class CasualDataset(BaseDataset):
             w2cs, Ks, tstamps = load_cameras(
                 f"{root_dir}/{camera_type}/{seq_name}.npy", H, W
             )
+        elif camera_type == "colmap":
+            Ks, w2cs = get_colmap_camera_params(
+            os.join(root_dir, f"flow3d_preprocessed/{seq_name}/sparse/"),
+            [frame_name + ".png" for frame_name in self.frame_names],                           
+            )
+            tstamps = torch.arange(len(frame_names))
         else:
             raise ValueError(f"Unknown camera type: {camera_type}")
         assert (
