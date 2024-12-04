@@ -178,7 +178,7 @@ class SceneModel(nn.Module):
         filter_mask: torch.Tensor | None = None,
     ) -> dict:
         print(w2cs.shape, target_w2cs.shape)
-        w2cs = self.camera.params.w2cs[t]
+        w2cs = self.camera.params.w2cs[t].unsuqeeze(0)
         target_w2cs = self.camera.params.w2cs[target_ts]
         print(w2cs.shape, target_w2cs.shape)
         device = w2cs.device
