@@ -139,7 +139,7 @@ class CasualDataset(BaseDataset):
             )
         elif camera_type == "colmap":
             Ks, w2cs = get_colmap_camera_params(
-            os.path.join(root_dir, f"flow3d_preprocessed/{seq_name}/sparse/"),
+            os.path.join(root_dir, f"flow3d_preprocessed/{seq_name}/sparse/0/"),
             [frame_name + ".png" for frame_name in self.frame_names],                           
             )
             tstamps = torch.arange(len(frame_names))
