@@ -151,7 +151,6 @@ def main(cfg: TrainConfig):
             batch = to_device(batch, device)
             loss = trainer.train_step(batch)
             pbar.set_description(f"Loss: {loss:.6f}")
-            print(train_dataset.get_w2cs().to(device) - trainer.model.camera.params.w2cs)
 
         if validator is not None:
             if (epoch > 0 and epoch % cfg.validate_every == 0) or (
