@@ -142,6 +142,8 @@ class CasualDataset(BaseDataset):
             os.path.join(root_dir, f"flow3d_preprocessed/{seq_name}/sparse/0/"),
             [frame_name + ".png" for frame_name in self.frame_names],                           
             )
+            Ks = torch.from_numpy(Ks[:, :3, :3].astype(np.float32))
+            w2cs = torch.from_numpy(w2cs.astype(np.float32))            
             tstamps = torch.arange(len(frame_names))
         else:
             raise ValueError(f"Unknown camera type: {camera_type}")
