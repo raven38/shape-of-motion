@@ -177,8 +177,8 @@ class SceneModel(nn.Module):
         fg_only: bool = False,
         filter_mask: torch.Tensor | None = None,
     ) -> dict:
-        w2cs = self.camera.get_w2cs[t]
-        target_w2cs = self.camera.get_w2cs[target_ts]
+        w2cs = self.camera.params.w2cs[t]
+        target_w2cs = self.camera.params.w2cs[target_ts]
         device = w2cs.device
         C = w2cs.shape[0]
 
