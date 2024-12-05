@@ -12,7 +12,7 @@ import yaml
 from loguru import logger as guru
 from tqdm import tqdm
 
-from flow3d.data import DavisDataConfig, get_train_val_datasets, iPhoneDataConfig
+from flow3d.data import DavisDataConfig, get_train_val_datasets, iPhoneDataConfig, CustomDataConfig
 from flow3d.renderer import Renderer
 from flow3d.trajectories import (
     get_arc_w2cs,
@@ -130,6 +130,17 @@ class VideoConfig:
                     load_from_cache=True,
                 ),
             ),
+        ]
+        | Annotated[
+            CustomDataConfig,
+            tyro.conf.subcommand(
+                name="custom",
+                default=CustomDataConfig(
+                    data_dir=tyro.MISSING,
+                    root_dir=tyro.MISSING,
+                    load_from_cache=True,
+                ),
+            )
         ]
     )
     trajectory: (
