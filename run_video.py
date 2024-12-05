@@ -136,7 +136,7 @@ class VideoConfig:
             tyro.conf.subcommand(
                 name="custom",
                 default=CustomDataConfig(
-                    data_dir=tyro.MISSING,
+                    seq_name=tyro.MISSING,
                     root_dir=tyro.MISSING,
                     load_from_cache=True,
                 ),
