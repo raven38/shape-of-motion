@@ -194,9 +194,10 @@ def align_monodepth_with_colmap(
             mono_disp_aligned,
         )
         # save png of colmap depth and aligned depth and metric depth
+        print(colmap_disp.shape)
         iio.imwrite(
             osp.join(output_monodepth_dir, image.name.split(".")[0] + "_colmap.png"),
-            to_uint16(colmap_disp),
+            to_uint16(colmap_depth),
         )
         iio.imwrite(
             osp.join(output_monodepth_dir, image.name.split(".")[0] + "_aligned.png"),
