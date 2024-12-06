@@ -120,6 +120,7 @@ def align_monodepth_with_metric_depth(
         # set depth values that are too small to invalid (0)
         aligned_disp[aligned_disp < min_thre] = 0.0
         out_file = osp.join(output_monodepth_dir, imname + ".npy")
+       
         np.save(out_file, aligned_disp)
 
 
@@ -192,6 +193,19 @@ def align_monodepth_with_colmap(
             osp.join(output_monodepth_dir, image.name.split(".")[0] + ".npy"),
             mono_disp_aligned,
         )
+        # save png of colmap depth and aligned depth and metric depth
+        iio.imwrite(
+            osp.join(output_monodepth_dir, image.name.split(".")[0] + "_colmap.png"),
+            to_uint16(colmap_disp),
+        )
+        iio.imwrite(
+            osp.join(output_monodepth_dir, image.name.split(".")[0] + "_aligned.png"),
+            to_uint16(mono_disp_aligned),
+        )
+        iio.imwrite(
+            osp.join(output_monodepth_dir, image.name.split(".")[0] + "_metric.png"),
+            to_uint16(mono_disp_map),
+        )   
 
 
 def main():
