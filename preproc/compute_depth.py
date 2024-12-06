@@ -178,6 +178,10 @@ def align_monodepth_with_colmap(
             cv2.INTER_LINEAR,
             borderMode=cv2.BORDER_CONSTANT,
         )[0]
+        iio.imwrite(
+            osp.join(output_monodepth_dir, image.name.split(".")[0] + "_remap.png"),
+            mono_disp,
+        )
         ms_colmap_disp = colmap_disp - np.median(colmap_disp) + 1e-8
         ms_mono_disp = mono_disp - np.median(mono_disp) + 1e-8
 
@@ -195,18 +199,18 @@ def align_monodepth_with_colmap(
         )
         # save png of colmap depth and aligned depth and metric depth
         print(colmap_disp.shape)
-        iio.imwrite(
-            osp.join(output_monodepth_dir, image.name.split(".")[0] + "_colmap.png"),
-            to_uint16(colmap_depth),
-        )
-        iio.imwrite(
-            osp.join(output_monodepth_dir, image.name.split(".")[0] + "_aligned.png"),
-            to_uint16(mono_disp_aligned),
-        )
-        iio.imwrite(
-            osp.join(output_monodepth_dir, image.name.split(".")[0] + "_metric.png"),
-            to_uint16(mono_disp_map),
-        )   
+        # iio.imwrite(
+        #     osp.join(output_monodepth_dir, image.name.split(".")[0] + "_colmap.png"),
+        #     to_uint16(colmap_depth),
+        # )
+        # iio.imwrite(
+        #     osp.join(output_monodepth_dir, image.name.split(".")[0] + "_aligned.png"),
+        #     to_uint16(mono_disp_aligned),
+        # )
+        # iio.imwrite(
+        #     osp.join(output_monodepth_dir, image.name.split(".")[0] + "_metric.png"),
+        #     to_uint16(mono_disp_map),
+        # )   
 
 
 def main():
