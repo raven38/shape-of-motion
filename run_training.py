@@ -139,6 +139,9 @@ def main(cfg: TrainConfig):
         )
 
     guru.info(f"Starting training from {trainer.global_step=}")
+    init_means = trainer.model.fg.params.means.clone().detach()
+    init_rots = trainer.model.motion_bases.params.rots.clone().detach()
+    init_transls = trainer.model.motion_bases.params.transls.clone().detach()
     for epoch in (
         pbar := tqdm(
             range(start_epoch, cfg.num_epochs),
@@ -151,6 +154,10 @@ def main(cfg: TrainConfig):
             batch = to_device(batch, device)
             loss = trainer.train_step(batch)
             pbar.set_description(f"Loss: {loss:.6f}")
+
+        print('means diff:', torch.norm(trainer.model.fg.params.means - init_means))
+        print('rots diff:', torch.norm(trainer.model.motion_bases.params.rots - init_rots))
+        print('transls diff:', torch.norm(trainer.model.motion_bases.params.transls - init_transls))
 
         if validator is not None:
             if (epoch > 0 and epoch % cfg.validate_every == 0) or (
