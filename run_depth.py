@@ -65,7 +65,7 @@ def main(cfg: VideoConfig):
     rads = (rc_pos.amax(0) - rc_pos.amin(0)) * 1.25
 
     if isinstance(cfg.trajectory, TrainTrajectoryConfig):
-        w2cs = cfg.trajectory.get_w2cs(train_c2ws)
+        w2cs = cfg.trajectory.get_w2cs(train_w2cs=train_w2cs)
     else:
         w2cs = cfg.trajectory.get_w2cs(
             ref_w2c=(
@@ -95,7 +95,7 @@ def main(cfg: VideoConfig):
             np.pi / 4,
             1.0,
             0.02,
-            (0, 0, 0),
+            color=(0, 0, 0),
             wxyz=vt.SO3.from_matrix(train_c2w[:3, :3]).wxyz,
             position=train_c2w[:3, -1],
         )
@@ -106,7 +106,7 @@ def main(cfg: VideoConfig):
             np.pi / 4,
             1.0,
             0.02,
-            (255, 0, 0),
+            color=(255, 0, 0),
             wxyz=vt.SO3.from_matrix(c2w[:3, :3]).wxyz,
             position=c2w[:3, -1],
         )
@@ -116,7 +116,7 @@ def main(cfg: VideoConfig):
             np.pi / 4,
             1.0,
             0.02,
-            (0, 0, 255),
+            color=(0, 0, 255),
             wxyz=vt.SO3.from_matrix(avg_c2w[:3, :3]).wxyz,
             position=avg_c2w[:3, -1],
         )
@@ -132,16 +132,19 @@ def main(cfg: VideoConfig):
     video = []
     for w2c, t in zip(tqdm(w2cs), ts):
         with torch.inference_mode():
-            img = renderer.model.render(int(t.item()), w2c[None], K[None], img_wh)[
+            img = renderer.model.render(int(t.item()), w2c[None], K[None], img_wh,
+                                        return_depth=True)[
                 "depth"
             ][0]
+        img = 1 / img
+        img = torch.clamp(img, 0, 1)
         img = (img.cpu().numpy() * 255.0).astype(np.uint8)
         video.append(img)
     video = np.stack(video, 0)
 
     video_dir = f"{cfg.work_dir}/videos/{datetime.now().strftime('%Y-%m-%d-%H%M%S')}"
     os.makedirs(video_dir, exist_ok=True)
-    iio.imwrite(f"{video_dir}/video.mp4", make_video_divisble(video), fps=cfg.fps)
+    iio.imwrite(f"{video_dir}/depth.mp4", make_video_divisble(video), fps=cfg.fps)
     with open(f"{video_dir}/cfg.yaml", "w") as f:
         yaml.dump(asdict(cfg), f, default_flow_style=False)
 

@@ -75,7 +75,7 @@ class FixedTrajectoryConfig(BaseTrajectoryConfig):
 
 @dataclass
 class TrainTrajectoryConfig(BaseTrajectoryConfig):
-    _fn: tyro.conf.SuppressFixed[Callable] = lambda ref_w2c, **_: ref_w2c
+    _fn: tyro.conf.SuppressFixed[Callable] = lambda train_w2cs, **_: train_w2cs
 
 @dataclass
 class BaseTimeConfig:
@@ -196,7 +196,7 @@ def main(cfg: VideoConfig):
     rads = (rc_pos.amax(0) - rc_pos.amin(0)) * 1.25
 
     if isinstance(cfg.trajectory, TrainTrajectoryConfig):
-        w2cs = cfg.trajectory.get_w2cs(train_c2ws)
+        w2cs = cfg.trajectory.get_w2cs(train_w2cs=train_w2cs)
     else:
         w2cs = cfg.trajectory.get_w2cs(
             ref_w2c=(
