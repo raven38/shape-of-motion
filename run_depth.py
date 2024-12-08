@@ -25,7 +25,7 @@ from flow3d.trajectories import (
 )
 from flow3d.vis.utils import make_video_divisble
 
-from run_video import VideoConfig
+from run_video import VideoConfig, TrainTrajectoryConfig
 
 torch.set_float32_matmul_precision("high")
 
