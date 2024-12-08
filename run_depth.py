@@ -1,3 +1,4 @@
+# run depth
 import os
 from dataclasses import asdict, dataclass
 from datetime import datetime
@@ -24,142 +25,10 @@ from flow3d.trajectories import (
 )
 from flow3d.vis.utils import make_video_divisble
 
+from run_video import VideoConfig
+
 torch.set_float32_matmul_precision("high")
 
-
-@dataclass
-class BaseTrajectoryConfig:
-    num_frames: int = tyro.MISSING
-    ref_t: int = -1
-    _fn: tyro.conf.SuppressFixed[Callable] = tyro.MISSING
-
-    def get_w2cs(self, **kwargs) -> torch.Tensor:
-        cfg_kwargs = asdict(self)
-        _fn = cfg_kwargs.pop("_fn")
-        cfg_kwargs.update(kwargs)
-        return _fn(**cfg_kwargs)
-
-
-@dataclass
-class ArcTrajectoryConfig(BaseTrajectoryConfig):
-    num_frames: int = 120
-    degree: float = 15.0
-    _fn: tyro.conf.SuppressFixed[Callable] = get_arc_w2cs
-
-
-@dataclass
-class LemniscateTrajectoryConfig(BaseTrajectoryConfig):
-    num_frames: int = 240
-    degree: float = 15.0
-    _fn: tyro.conf.SuppressFixed[Callable] = get_lemniscate_w2cs
-
-
-@dataclass
-class SpiralTrajectoryConfig(BaseTrajectoryConfig):
-    num_frames: int = 240
-    rads: float = 0.5
-    zrate: float = 0.5
-    rots: int = 2
-    _fn: tyro.conf.SuppressFixed[Callable] = get_spiral_w2cs
-
-
-@dataclass
-class WanderTrajectoryConfig(BaseTrajectoryConfig):
-    num_frames: int = 120
-    _fn: tyro.conf.SuppressFixed[Callable] = get_wander_w2cs
-
-
-@dataclass
-class FixedTrajectoryConfig(BaseTrajectoryConfig):
-    _fn: tyro.conf.SuppressFixed[Callable] = lambda ref_w2c, **_: ref_w2c[None]
-
-@dataclass
-class TrainTrajectoryConfig(BaseTrajectoryConfig):
-    _fn: tyro.conf.SuppressFixed[Callable] = lambda ref_w2c, **_: ref_w2c
-
-@dataclass
-class BaseTimeConfig:
-    _fn: tyro.conf.SuppressFixed[Callable] = tyro.MISSING
-
-    def get_ts(self, **kwargs) -> torch.Tensor:
-        cfg_kwargs = asdict(self)
-        _fn = cfg_kwargs.pop("_fn")
-        return _fn(**kwargs, **cfg_kwargs)
-
-
-@dataclass
-class ReplayTimeConfig(BaseTimeConfig):
-    _fn: tyro.conf.SuppressFixed[Callable] = (
-        lambda num_frames, traj_frames, device, **_: F.pad(
-            torch.arange(num_frames, device=device)[:traj_frames],
-            (0, max(traj_frames - num_frames, 0)),
-            value=num_frames - 1,
-        )
-    )
-
-
-@dataclass
-class FixedTimeConfig(BaseTimeConfig):
-    t: int = 0
-    _fn: tyro.conf.SuppressFixed[Callable] = (
-        lambda t, num_frames, traj_frames, device, **_: torch.tensor(
-            [min(t, num_frames - 1)], device=device
-        ).expand(traj_frames)
-    )
-
-
-@dataclass
-class VideoConfig:
-    work_dir: str
-    data: (
-        Annotated[
-            iPhoneDataConfig,
-            tyro.conf.subcommand(
-                name="iphone",
-                default=iPhoneDataConfig(
-                    data_dir=tyro.MISSING,
-                    load_from_cache=True,
-                    skip_load_imgs=True,
-                ),
-            ),
-        ]
-        | Annotated[
-            DavisDataConfig,
-            tyro.conf.subcommand(
-                name="davis",
-                default=DavisDataConfig(
-                    seq_name=tyro.MISSING,
-                    root_dir=tyro.MISSING,
-                    load_from_cache=True,
-                ),
-            ),
-        ]
-        | Annotated[
-            CustomDataConfig,
-            tyro.conf.subcommand(
-                name="custom",
-                default=CustomDataConfig(
-                    seq_name=tyro.MISSING,
-                    root_dir=tyro.MISSING,
-                    load_from_cache=True,
-                ),
-            )
-        ]
-    )
-    trajectory: (
-        Annotated[ArcTrajectoryConfig, tyro.conf.subcommand(name="arc")]
-        | Annotated[LemniscateTrajectoryConfig, tyro.conf.subcommand(name="lemniscate")]
-        | Annotated[SpiralTrajectoryConfig, tyro.conf.subcommand(name="spiral")]
-        | Annotated[WanderTrajectoryConfig, tyro.conf.subcommand(name="wander")]
-        | Annotated[FixedTrajectoryConfig, tyro.conf.subcommand(name="fixed")]
-        | Annotated[TrainTrajesctoryConfig, tyro.conf.subcommand(name="train")]
-    )
-    time: (
-        Annotated[ReplayTimeConfig, tyro.conf.subcommand(name="replay")]
-        | Annotated[FixedTimeConfig, tyro.conf.subcommand(name="fixed")]
-    )
-    fps: float = 15.0
-    port: int = 8890
 
 
 def main(cfg: VideoConfig):
@@ -264,7 +133,7 @@ def main(cfg: VideoConfig):
     for w2c, t in zip(tqdm(w2cs), ts):
         with torch.inference_mode():
             img = renderer.model.render(int(t.item()), w2c[None], K[None], img_wh)[
-                "img"
+                "depth"
             ][0]
         img = (img.cpu().numpy() * 255.0).astype(np.uint8)
         video.append(img)
