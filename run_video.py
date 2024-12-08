@@ -152,7 +152,7 @@ class VideoConfig:
         | Annotated[SpiralTrajectoryConfig, tyro.conf.subcommand(name="spiral")]
         | Annotated[WanderTrajectoryConfig, tyro.conf.subcommand(name="wander")]
         | Annotated[FixedTrajectoryConfig, tyro.conf.subcommand(name="fixed")]
-        | Annotated[TrainTrajesctoryConfig, tyro.conf.subcommand(name="train")]
+        | Annotated[TrainTrajectoryConfig, tyro.conf.subcommand(name="train")]
     )
     time: (
         Annotated[ReplayTimeConfig, tyro.conf.subcommand(name="replay")]
