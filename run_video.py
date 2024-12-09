@@ -203,7 +203,7 @@ def main(cfg: VideoConfig):
     if isinstance(cfg.trajectory, TrainTrajectoryConfig):
         w2cs = cfg.trajectory.get_w2cs(train_w2cs=train_w2cs)
     elif isinstance(cfg.trajectory, OptTrainTrajectoryConfig):
-        w2cs = cfg.trajectory.get_w2cs(train_w2cs=renderer.model.camera.get_w2cs())
+        w2cs = cfg.trajectory.get_w2cs(train_w2cs=renderer.model.camera.get_w2cs().detach())
     else:
         w2cs = cfg.trajectory.get_w2cs(
             ref_w2c=(
