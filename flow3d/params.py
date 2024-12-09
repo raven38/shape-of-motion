@@ -135,7 +135,7 @@ class CameraParams(nn.Module):
         return CameraParams(**args)
 
     def get_w2cs(self) -> torch.Tensor:
-        return self.params["colors"]
+        return self.params["w2cs"]
 
 
 

@@ -78,6 +78,10 @@ class TrainTrajectoryConfig(BaseTrajectoryConfig):
     _fn: tyro.conf.SuppressFixed[Callable] = lambda train_w2cs, **_: train_w2cs
 
 @dataclass
+class OptTrainTrajectoryConfig(BaseTrajectoryConfig):
+    _fn: tyro.conf.SuppressFixed[Callable] = lambda train_w2cs, **_: train_w2cs
+
+@dataclass
 class BaseTimeConfig:
     _fn: tyro.conf.SuppressFixed[Callable] = tyro.MISSING
 
@@ -153,6 +157,7 @@ class VideoConfig:
         | Annotated[WanderTrajectoryConfig, tyro.conf.subcommand(name="wander")]
         | Annotated[FixedTrajectoryConfig, tyro.conf.subcommand(name="fixed")]
         | Annotated[TrainTrajectoryConfig, tyro.conf.subcommand(name="train")]
+        | Annotated[OptTrainTrajectoryConfig, tyro.conf.subcommand(name="opt")]
     )
     time: (
         Annotated[ReplayTimeConfig, tyro.conf.subcommand(name="replay")]
@@ -197,6 +202,8 @@ def main(cfg: VideoConfig):
 
     if isinstance(cfg.trajectory, TrainTrajectoryConfig):
         w2cs = cfg.trajectory.get_w2cs(train_w2cs=train_w2cs)
+    elif isinstance(cfg.trajectory, OptTrainTrajectoryConfig):
+        w2cs = cfg.trajectory.get_w2cs(train_w2cs=renderer.model.camera.get_w2cs())
     else:
         w2cs = cfg.trajectory.get_w2cs(
             ref_w2c=(

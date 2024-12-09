@@ -25,6 +25,7 @@ from flow3d.data.utils import to_device
 from flow3d.init_utils import (
     init_bg,
     init_fg_from_tracks_3d,
+    init_camera,
     init_motion_params_with_procrustes,
     run_initial_optim,
     vis_init_params,
@@ -194,11 +195,12 @@ def initialize_and_checkpoint_model(
     # run initial optimization
     Ks = train_dataset.get_Ks().to(device)
     w2cs = train_dataset.get_w2cs().to(device)
+    camera_params = init_camera(Ks, w2cs)
     run_initial_optim(fg_params, motion_bases, tracks_3d, Ks, w2cs)
     if vis and cfg.port is not None:
         server = get_server(port=cfg.port)
         vis_init_params(server, fg_params, motion_bases)
-    model = SceneModel(Ks, w2cs, fg_params, motion_bases, bg_params)
+    model = SceneModel(Ks, w2cs, fg_params, motion_bases, bg_params, camera_params)
 
     guru.info(f"Saving initialization to {ckpt_path}")
     os.makedirs(os.path.dirname(ckpt_path), exist_ok=True)

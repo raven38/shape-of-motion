@@ -16,6 +16,7 @@ class SceneModel(nn.Module):
         fg_params: GaussianParams,
         motion_bases: MotionBases,
         bg_params: GaussianParams | None = None,
+        cameras: CameraParams | None = None,
     ):
         super().__init__()
         self.num_frames = motion_bases.num_frames
@@ -26,7 +27,7 @@ class SceneModel(nn.Module):
         self.register_buffer("bg_scene_scale", torch.as_tensor(scene_scale))
         self.register_buffer("Ks", Ks)
         self.register_buffer("w2cs", w2cs)
-        self.camera = CameraParams(w2cs)
+        self.camera = cameras
 
         self._current_xys = None
         self._current_radii = None
@@ -154,7 +155,10 @@ class SceneModel(nn.Module):
         )
         Ks = state_dict[f"{prefix}Ks"]
         w2cs = state_dict[f"{prefix}w2cs"]
-        return SceneModel(Ks, w2cs, fg, motion_bases, bg)
+        camera = CameraParams.init_from_state_dict(
+            state_dict, prefix=f"{prefix}camera.params."
+        )
+        return SceneModel(Ks, w2cs, fg, motion_bases, bg, camera)
 
     def render(
         self,

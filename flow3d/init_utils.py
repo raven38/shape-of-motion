@@ -23,7 +23,7 @@ from flow3d.loss_utils import (
     knn,
     masked_l1_loss,
 )
-from flow3d.params import GaussianParams, MotionBases
+from flow3d.params import GaussianParams, MotionBases, CameraParams
 from flow3d.tensor_dataclass import StaticObservations, TrackObservations
 from flow3d.transforms import cont_6d_to_rmat, rt_to_mat4, solve_procrustes
 from flow3d.vis.utils import draw_keypoints_video, get_server, project_2d_tracks
@@ -56,6 +56,12 @@ def init_fg_from_tracks_3d(
     opacities = torch.logit(torch.full((num_fg,), 0.7))
     gaussians = GaussianParams(means, quats, scales, colors, opacities, motion_coefs)
     return gaussians
+
+def init_camera(
+        w2cs: torch.Tensor,
+) -> CameraParams:
+    return CameraParams(w2cs=w2cs)
+
 
 
 def init_bg(

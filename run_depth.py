@@ -25,7 +25,7 @@ from flow3d.trajectories import (
 )
 from flow3d.vis.utils import make_video_divisble
 
-from run_video import VideoConfig, TrainTrajectoryConfig
+from run_video import VideoConfig, TrainTrajectoryConfig, OptTrainTrajectoryConfig
 
 torch.set_float32_matmul_precision("high")
 
@@ -66,6 +66,8 @@ def main(cfg: VideoConfig):
 
     if isinstance(cfg.trajectory, TrainTrajectoryConfig):
         w2cs = cfg.trajectory.get_w2cs(train_w2cs=train_w2cs)
+    elif isinstance(cfg.trajectory, OptTrainTrajectoryConfig):
+        w2cs = cfg.trajectory.get_w2cs(train_w2cs=renderer.model.camera.get_w2cs())        
     else:
         w2cs = cfg.trajectory.get_w2cs(
             ref_w2c=(
