@@ -30,11 +30,17 @@ class CameraLRConfig:
     w2cs: float = 1.6e-4
 
 @dataclass
+class DepthParamsLRConfig:
+    scales: float = 1.6e-4
+    shifts: float = 1.6e-4
+
+@dataclass
 class SceneLRConfig:
     fg: FGLRConfig
     bg: BGLRConfig
     motion_bases: MotionLRConfig
     camera: CameraLRConfig
+    depth: DepthParamsLRConfig
 
 
 @dataclass

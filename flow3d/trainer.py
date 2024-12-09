@@ -389,6 +389,7 @@ class Trainer:
 
         pred_depth = cast(torch.Tensor, rendered_all["depth"])
         pred_disp = 1.0 / (pred_depth + 1e-5)
+        depths = depths * self.model.depth.params.scales[ts[i].item()] + self.model.depth.params.shifts[ts[i].item()]
         tgt_disp = 1.0 / (depths[..., None] + 1e-5)
         depth_loss = masked_l1_loss(
             pred_disp,
@@ -407,6 +408,7 @@ class Trainer:
 
         # mapped depth loss (using cached depth with EMA)
         #  mapped_depth_loss = 0.0
+        target_track_depths = target_track_depths * self.model.depth.params.scales[target_ts[i]] + self.model.depth.params.shifts[target_ts[i]]
         mapped_depth_gt = torch.cat([x.reshape(-1) for x in target_track_depths], dim=0)
         mapped_depth_loss = masked_l1_loss(
             1 / (mapped_depth[masks_flatten][visibles] + 1e-5),

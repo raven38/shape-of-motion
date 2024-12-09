@@ -137,6 +137,29 @@ class CameraParams(nn.Module):
     def get_w2cs(self) -> torch.Tensor:
         return self.params["w2cs"]
 
+class DepthParams(nn.Module):
+    def __init__(
+        self,
+        scales: torch.Tensor,
+        shifts: torch.Tensor,
+    ):
+        super().__init__()
+        params_dict = {
+            "shifts": nn.Parameter(shifts),
+            "scales": nn.Parameter(scales),
+        }
+        self.params = nn.ParameterDict(params_dict)
+
+    @staticmethod
+    def init_from_state_dict(state_dict, prefix="params."):
+        req_keys = ["shifts", "scales"]
+        assert all(f"{prefix}{k}" in state_dict for k in req_keys)
+        args = {k: state_dict[f"{prefix}{k}"] for k in req_keys}
+
+        return DepthParams(**args)
+
+    def scale_depth(self, depth) -> torch.Tensor:
+        return depth * self.params["scales"] + self.params["shifts"]
 
 
 class MotionBases(nn.Module):

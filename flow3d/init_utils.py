@@ -23,7 +23,7 @@ from flow3d.loss_utils import (
     knn,
     masked_l1_loss,
 )
-from flow3d.params import GaussianParams, MotionBases, CameraParams
+from flow3d.params import GaussianParams, MotionBases, CameraParams, DepthParams
 from flow3d.tensor_dataclass import StaticObservations, TrackObservations
 from flow3d.transforms import cont_6d_to_rmat, rt_to_mat4, solve_procrustes
 from flow3d.vis.utils import draw_keypoints_video, get_server, project_2d_tracks
@@ -62,7 +62,10 @@ def init_camera(
 ) -> CameraParams:
     return CameraParams(w2cs=w2cs)
 
-
+def init_depth_scale(
+        num_frames: int,
+) -> DepthParams:
+    return DepthParams(scale=torch.ones(num_frames), shift=torch.zeros(num_frames))
 
 def init_bg(
     points: StaticObservations,

@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from gsplat.rendering import rasterization
 from torch import Tensor
 
-from flow3d.params import GaussianParams, MotionBases, CameraParams
+from flow3d.params import GaussianParams, MotionBases, CameraParams, DepthParams
 
 
 class SceneModel(nn.Module):
@@ -17,6 +17,7 @@ class SceneModel(nn.Module):
         motion_bases: MotionBases,
         bg_params: GaussianParams | None = None,
         cameras: CameraParams | None = None,
+        depth_params: DepthParams | None = None,
     ):
         super().__init__()
         self.num_frames = motion_bases.num_frames
@@ -28,6 +29,7 @@ class SceneModel(nn.Module):
         self.register_buffer("Ks", Ks)
         self.register_buffer("w2cs", w2cs)
         self.camera = cameras
+        self.depth_scale = depth_params
 
         self._current_xys = None
         self._current_radii = None
@@ -158,7 +160,10 @@ class SceneModel(nn.Module):
         camera = CameraParams.init_from_state_dict(
             state_dict, prefix=f"{prefix}camera.params."
         )
-        return SceneModel(Ks, w2cs, fg, motion_bases, bg, camera)
+        depth = DepthParams.init_from_state_dict(
+            state_dict, prefix=f"{prefix}depth_params.params."
+        )
+        return SceneModel(Ks, w2cs, fg, motion_bases, bg, camera, depth)
 
     def render(
         self,
