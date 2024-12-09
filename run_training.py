@@ -195,7 +195,7 @@ def initialize_and_checkpoint_model(
     # run initial optimization
     Ks = train_dataset.get_Ks().to(device)
     w2cs = train_dataset.get_w2cs().to(device)
-    camera_params = init_camera(Ks, w2cs)
+    camera_params = init_camera(w2cs)
     run_initial_optim(fg_params, motion_bases, tracks_3d, Ks, w2cs)
     if vis and cfg.port is not None:
         server = get_server(port=cfg.port)
